@@ -12,7 +12,6 @@ services:
       - MICRO_REGISTRY=mdns
     links:
       - consignment
-      - vessel
 
   lotus_db:
     image: "postgres:9.6"

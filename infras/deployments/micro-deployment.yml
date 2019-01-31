@@ -1,27 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: default
   name: micro
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: micro
+  replicas: 1
   template:
     metadata:
       labels:
         app: micro
     spec:
-        containers:
+      containers:
         - name: micro
+          command: [
+		      "./micro web",
+		      "--server_address=0.0.0.0:8080",
+		      "--broker_address=0.0.0.0:10001"
+	        ]
           image: microhq/micro:kubernetes
-          args:
-            - "api"
-            - "--handler=rpc"
-            - "--namespace=shippy"
-          env:
-          - name: MICRO_API_ADDRESS
-            value: ":80"
+          imagePullPolicy: Always
           ports:
-          - containerPort: 80
-            name: port
+          - containerPort: 8080
+            name: micro-port
