@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  ###################################
+  # Micro web to view and query service from web dashboard
+  microweb:
+    image: microhq/micro:latest
+    command: web
+    ports:
+      - "80:8082"
+    environment:
+      - MICRO_REGISTRY=mdns
+    links:
+      - consignment
+      - vessel
+
+  lotus_db:
+    image: "postgres:9.6"
+    restart: always
+    environment:
+      POSTGRES_USER: lotus
+      POSTGRES_PASSWORD: lotus
+      POSTGRES_DB: lotus
+    container_name: lotus_db
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+
+  ###################################
+  # Our consignment service
+  consignment:
+    image: consignment-srv
+    ports:
+      - "8081:8080"
+    environment:
+      - MICRO_REGISTRY=mdns
+      - DB_HOST=lotus_db
+      - DB_PORT=5432
+      - DB_NAME=lotus
+      - DB_USER=lotus
+      - DB_PASS=lotus
+      - DB_SSL=disable
+    container_name: consignment
+    depends_on:
+      - lotus_db
+    links:
+      - lotus_db
+
